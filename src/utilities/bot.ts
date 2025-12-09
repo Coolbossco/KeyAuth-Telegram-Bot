@@ -17,7 +17,7 @@ export default class TelegramBot extends Bot {
   public buttons: Map<string, Button> = new Map();
   public commands: Map<string, Command> = new Map();
   public cooldowns = new Map<string, Map<number, number>>();
-public database = new BunDB(process.env.DATABASE_PATH || "keyauth.sqlite");
+  public database: BunDB;
 
   /**
    * Create a new bot instance
@@ -25,6 +25,16 @@ public database = new BunDB(process.env.DATABASE_PATH || "keyauth.sqlite");
    */
   constructor(token: string) {
     super(token);
+
+    const databasePath = process.env.DATABASE_PATH || process.env.database_path || "keyauth.sqlite";
+    
+    // Log the database path being used
+    logger.info(`Initializing database at path: ${databasePath}`);
+    if (databasePath === "keyauth.sqlite") {
+      logger.warn("Using default database path. If you intended to use a persistent volume, check your DATABASE_PATH environment variable.");
+    }
+
+    this.database = new BunDB(databasePath);
 
     Promise.all([
       config.loading.buttons &&
