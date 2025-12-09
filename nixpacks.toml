@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["bun", "python3", "gnumake", "gcc"]
+nixPkgs = ["bun", "python311", "gnumake", "gcc"]
 
 [phases.install]
 cmds = ["bun install"]
