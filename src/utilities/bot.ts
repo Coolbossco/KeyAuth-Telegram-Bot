@@ -8,8 +8,7 @@ import path from "path";
 import logger from "./logger";
 import config from "../config";
 import { Bot } from "grammy";
-import { BunDB } from "bun.db"; // Comment or remove this line if not using Bun
-// import { QuickDB } from "quick.db"; // Uncomment if not using Bun
+import { BunDB } from "./database";
 import { stateManager } from "./state";
 import type { Button } from "../interfaces/Button";
 import type { Command } from "../interfaces/Command";
@@ -18,8 +17,7 @@ export default class TelegramBot extends Bot {
   public buttons: Map<string, Button> = new Map();
   public commands: Map<string, Command> = new Map();
   public cooldowns = new Map<string, Map<number, number>>();
-  public database = new BunDB(process.env.DATABASE_PATH || "keyauth.sqlite"); // Comment or remove this line if not using Bun
-  // public database = new QuickDB(); // Uncomment if not using Bun
+public database = new BunDB(process.env.DATABASE_PATH || "keyauth.sqlite");
 
   /**
    * Create a new bot instance
