@@ -37,9 +37,26 @@ export class BunDB {
                  
                  const transaction = this.db.transaction((rows: any[]) => {
                     for (const row of rows) {
-                        // Assuming quick.db structure: ID (key), json (value)
-                        if (row.ID && row.json) {
-                            insertStmt.run(row.ID, row.json);
+                        try {
+                            // Check for monolithic keys that need splitting
+                            if (["applications", "selectedapp", "masks"].includes(row.ID)) {
+                                console.log(`[BunDB] Splitting monolithic key: ${row.ID}`);
+                                const data = JSON.parse(row.json);
+                                for (const userId in data) {
+                                    if (Object.prototype.hasOwnProperty.call(data, userId)) {
+                                        const newKey = `${row.ID}.${userId}`;
+                                        const newValue = JSON.stringify(data[userId]);
+                                        insertStmt.run(newKey, newValue);
+                                    }
+                                }
+                            } else {
+                                // Standard migration for other keys
+                                if (row.ID && row.json) {
+                                    insertStmt.run(row.ID, row.json);
+                                }
+                            }
+                        } catch (e) {
+                            console.error(`[BunDB] Error migrating row ${row.ID}:`, e);
                         }
                     }
                  });
